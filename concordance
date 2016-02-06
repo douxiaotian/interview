@@ -1,0 +1,65 @@
+import java.io.*;
+import java.util.*;
+import javafx.util.Pair;
+
+public class Concordance {
+
+	public static String filterpunction(String s){
+		String[] punction = {",",";",":"};
+		for(String c: punction){
+			s = s.replaceAll(c, "");
+		}
+		return s;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		
+		Map<String, PriorityQueue> concordance = new TreeMap<String, PriorityQueue>();
+
+		PriorityQueue<String> ps = new PriorityQueue<String>();
+	    String filename = "Concordance_sample";
+		String line = "";
+		int count = 1;
+		FileReader fileReader = new FileReader(filename);
+	    BufferedReader bufferedReader = new BufferedReader(fileReader);
+
+	    while((line = bufferedReader.readLine()) != null) {
+	    	
+	    	line = filterpunction(line);
+	    	String[] temps = line.split(" ");
+	    	for(String temp: temps){
+	    		 temp = temp.toLowerCase();
+	    		if(concordance.containsKey(temp)){
+	    			concordance.get(temp).add(count);
+	    		}
+	    		else{
+	    			PriorityQueue tq = new PriorityQueue<Integer>();
+	    			
+	    			tq.add(count); 
+	    			concordance.put(temp, tq);
+	    		}
+	    		ps.add(temp);
+	    		if(temp.equals("frequencies.")) {
+	    			count++;
+	    		}
+
+	    	}
+	    }
+	    bufferedReader.close();
+	    
+	    Map<String, PriorityQueue> treeMap = new TreeMap<String, PriorityQueue>(concordance);
+	    for (Map.Entry<String,PriorityQueue> entry : treeMap.entrySet()) {
+	    	String temp = entry.getKey();
+	        PriorityQueue<Integer> pq = entry.getValue();
+	        if(temp.endsWith(".")) temp = temp.substring(0, temp.length()-1);
+	    	System.out.print(temp + " {" + pq.size() + ":");
+	        System.out.print(pq.poll());
+	        
+	        while(!pq.isEmpty()){
+	        	System.out.print("," + pq.poll());
+	        }
+	        System.out.println("}");
+	    };   
+	}
+
+}
